@@ -1,149 +1,109 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <Adafruit_ADXL345_U.h>
+#include <Adafruit_LSM303_U.h>
+#include <Adafruit_L3GD20_U.h>
 
 /* Assign a unique ID to this sensor at the same time */
-Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
+Adafruit_L3GD20_Unified gyro = Adafruit_L3GD20_Unified(20);
 
-void displaySensorDetails(void)
+void displayAccelSensorDetails(void)
 {
-  sensor_t sensor;
-  accel.getSensor(&sensor);
+  sensor_t accelSensor;
+  accel.getSensor(&accelSensor);
   Serial.println("------------------------------------");
-  Serial.print  ("Sensor:       "); Serial.println(sensor.name);
-  Serial.print  ("Driver Ver:   "); Serial.println(sensor.version);
-  Serial.print  ("Unique ID:    "); Serial.println(sensor.sensor_id);
-  Serial.print  ("Max Value:    "); Serial.print(sensor.max_value); Serial.println(" m/s^2");
-  Serial.print  ("Min Value:    "); Serial.print(sensor.min_value); Serial.println(" m/s^2");
-  Serial.print  ("Resolution:   "); Serial.print(sensor.resolution); Serial.println(" m/s^2");  
+  Serial.print  ("Sensor:       "); Serial.println(accelSensor.name);
+  Serial.print  ("Driver Ver:   "); Serial.println(accelSensor.version);
+  Serial.print  ("Unique ID:    "); Serial.println(accelSensor.sensor_id);
+  Serial.print  ("Max Value:    "); Serial.print(accelSensor.max_value); Serial.println(" m/s^2");
+  Serial.print  ("Min Value:    "); Serial.print(accelSensor.min_value); Serial.println(" m/s^2");
+  Serial.print  ("Resolution:   "); Serial.print(accelSensor.resolution); Serial.println(" m/s^2");
+  Serial.println("------------------------------------");
+  Serial.println("");
+  delay(100);
+}
+
+void displayGyroSensorDetails(void)
+{
+  sensor_t gyroSensor;
+  gyro.getSensor(&gyroSensor);
+  Serial.println("------------------------------------");
+  Serial.print  ("Sensor:       "); Serial.println(gyroSensor.name);
+  Serial.print  ("Driver Ver:   "); Serial.println(gyroSensor.version);
+  Serial.print  ("Unique ID:    "); Serial.println(gyroSensor.sensor_id);
+  Serial.print  ("Max Value:    "); Serial.print(gyroSensor.max_value); Serial.println(" rad/s");
+  Serial.print  ("Min Value:    "); Serial.print(gyroSensor.min_value); Serial.println(" rad/s");
+  Serial.print  ("Resolution:   "); Serial.print(gyroSensor.resolution); Serial.println(" rad/s");  
   Serial.println("------------------------------------");
   Serial.println("");
   delay(500);
 }
 
-void displayDataRate(void)
+void initSensor(void)
 {
-  Serial.print  ("Data Rate:    "); 
-  
-  switch(accel.getDataRate())
-  {
-    case ADXL345_DATARATE_3200_HZ:
-      Serial.print  ("3200 "); 
-      break;
-    case ADXL345_DATARATE_1600_HZ:
-      Serial.print  ("1600 "); 
-      break;
-    case ADXL345_DATARATE_800_HZ:
-      Serial.print  ("800 "); 
-      break;
-    case ADXL345_DATARATE_400_HZ:
-      Serial.print  ("400 "); 
-      break;
-    case ADXL345_DATARATE_200_HZ:
-      Serial.print  ("200 "); 
-      break;
-    case ADXL345_DATARATE_100_HZ:
-      Serial.print  ("100 "); 
-      break;
-    case ADXL345_DATARATE_50_HZ:
-      Serial.print  ("50 "); 
-      break;
-    case ADXL345_DATARATE_25_HZ:
-      Serial.print  ("25 "); 
-      break;
-    case ADXL345_DATARATE_12_5_HZ:
-      Serial.print  ("12.5 "); 
-      break;
-    case ADXL345_DATARATE_6_25HZ:
-      Serial.print  ("6.25 "); 
-      break;
-    case ADXL345_DATARATE_3_13_HZ:
-      Serial.print  ("3.13 "); 
-      break;
-    case ADXL345_DATARATE_1_56_HZ:
-      Serial.print  ("1.56 "); 
-      break;
-    case ADXL345_DATARATE_0_78_HZ:
-      Serial.print  ("0.78 "); 
-      break;
-    case ADXL345_DATARATE_0_39_HZ:
-      Serial.print  ("0.39 "); 
-      break;
-    case ADXL345_DATARATE_0_20_HZ:
-      Serial.print  ("0.20 "); 
-      break;
-    case ADXL345_DATARATE_0_10_HZ:
-      Serial.print  ("0.10 "); 
-      break;
-    default:
-      Serial.print  ("???? "); 
-      break;
-  }  
-  Serial.println(" Hz");  
-}
+#ifndef ESP8266
+  while (!Serial);     // will pause Zero, Leonardo, etc until serial console opens
+#endif
 
-void displayRange(void)
-{
-  Serial.print  ("Range:         +/- "); 
-  
-  switch(accel.getRange())
-  {
-    case ADXL345_RANGE_16_G:
-      Serial.print  ("16 "); 
-      break;
-    case ADXL345_RANGE_8_G:
-      Serial.print  ("8 "); 
-      break;
-    case ADXL345_RANGE_4_G:
-      Serial.print  ("4 "); 
-      break;
-    case ADXL345_RANGE_2_G:
-      Serial.print  ("2 "); 
-      break;
-    default:
-      Serial.print  ("?? "); 
-      break;
-  }  
-  Serial.println(" g");  
-}
-
-void initSensor(void) 
-{
+  // ACCEL Block
   Serial.begin(9600);
   Serial.println("Accelerometer Test"); Serial.println("");
-  
+
   /* Initialise the sensor */
   if(!accel.begin())
   {
     /* There was a problem detecting the ADXL345 ... check your connections */
-    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    Serial.println("Ooops, no LSM303 detected ... Check your wiring!");
     while(1);
   }
 
-  /* Set the range to whatever is appropriate for your project */
-  accel.setRange(ADXL345_RANGE_16_G);
-  // displaySetRange(ADXL345_RANGE_8_G);
-  // displaySetRange(ADXL345_RANGE_4_G);
-  // displaySetRange(ADXL345_RANGE_2_G);
+  displayAccelSensorDetails();
+
+  //GYRO Block
+  Serial.println("Gyroscope Test"); Serial.println("");
   
-  /* Display some basic information on this sensor */
-  displaySensorDetails();
+  /* Enable auto-ranging */
+  gyro.enableAutoRange(true);
   
-  /* Display additional settings (outside the scope of sensor_t) */
-  displayDataRate();
-  displayRange();
-  Serial.println("");
+  /* Initialise the sensor */
+  if(!gyro.begin())
+  {
+    /* There was a problem detecting the L3GD20 ... check your connections */
+    Serial.println("Ooops, no L3GD20 detected ... Check your wiring!");
+    while(1);
+  }
+  
+  displayGyroSensorDetails();
 }
 
-void showSensorData(void) 
+void showAccelData(void)
+{
+  /* Get a new sensor event */
+  sensors_event_t accelEvent;
+  accel.getEvent(&accelEvent);
+
+  /* Display the results (acceleration is measured in m/s^2) */
+  Serial.print("X: "); Serial.print(accelEvent.acceleration.x); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(accelEvent.acceleration.y); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(accelEvent.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
+
+  /* Note: You can also get the raw (non unified values) for */
+  /* the last data sample as follows. The .getEvent call populates */
+  /* the raw values used below. */
+  //Serial.print("X Raw: "); Serial.print(accel.raw.x); Serial.print("  ");
+  //Serial.print("Y Raw: "); Serial.print(accel.raw.y); Serial.print("  ");
+  //Serial.print("Z Raw: "); Serial.print(accel.raw.z); Serial.println("");
+}
+
+void showGyroData(void) 
 {
   /* Get a new sensor event */ 
-  sensors_event_t event; 
-  accel.getEvent(&event);
+  sensors_event_t gyroEvent; 
+  gyro.getEvent(&gyroEvent);
  
-  /* Display the results (acceleration is measured in m/s^2) */
-  Serial.print("X: "); Serial.print(event.acceleration.x); Serial.print("  ");
-  Serial.print("Y: "); Serial.print(event.acceleration.y); Serial.print("  ");
-  Serial.print("Z: "); Serial.print(event.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
-  delay(500);
+  /* Display the results (speed is measured in rad/s) */
+  Serial.print("X: "); Serial.print(gyroEvent.gyro.x); Serial.print("  ");
+  Serial.print("Y: "); Serial.print(gyroEvent.gyro.y); Serial.print("  ");
+  Serial.print("Z: "); Serial.print(gyroEvent.gyro.z); Serial.print("  ");
+  Serial.println("rad/s ");
 }

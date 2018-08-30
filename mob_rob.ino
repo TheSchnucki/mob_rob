@@ -1,3 +1,4 @@
+
 void setup() {
   initMotors();
   initSensor();
@@ -5,8 +6,10 @@ void setup() {
 }
 
 void loop() {
-  driveForward (50);
-  showSensorData();
+  //driveForward (50);
+  showAccelData();
+  showGyroData();
+
   delay(20);
 
 }
