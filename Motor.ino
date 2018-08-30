@@ -6,8 +6,6 @@ int IN3 = 6;
 int IN4 = 7;
 int ENB = 10;
 
-int testSpeed = 100;
-
 void initMotors() {
   pinMode(ENA, OUTPUT);
   pinMode(IN1, OUTPUT);
@@ -17,7 +15,7 @@ void initMotors() {
   pinMode(ENB, OUTPUT);
 }
 
-void driveForward () {
+void driveForward (int testSpeed) {
   analogWrite (ENA, testSpeed);
   digitalWrite (IN1, HIGH);
   digitalWrite (IN2, LOW);
@@ -26,7 +24,13 @@ void driveForward () {
   analogWrite (ENB, testSpeed); 
 }
 
-void driveBackward() {
+void driveBackward(int testSpeed) {
+  analogWrite (ENA, testSpeed);
+  digitalWrite (IN1, LOW);
+  digitalWrite (IN2, HIGH);
+  digitalWrite (IN3, LOW);
+  digitalWrite (IN4, HIGH);
+  analogWrite (ENB, testSpeed);
   
 }
 
