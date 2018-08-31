@@ -1,4 +1,6 @@
 
+uint32_t timer;
+
 void setup() {
   initMotors();
   initSensor();

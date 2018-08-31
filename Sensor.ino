@@ -3,13 +3,13 @@
 #include <Adafruit_LSM303_U.h>
 #include <Adafruit_L3GD20_U.h>
 
-float gyroX = 0, gyroY = 0, gyroZ = 0;
-float gyroBiasX = 0, gyroBiasY = 0, gyroBiasZ = 0;
+float accelX, accelY, accelZ;
+float accelBiasX, accelBiasY, accelBiasZ;
+double accelRoll = 0.0;
 
-
-float accelX = 0, accelY = 0, accelZ = 0;
-float accelBiasX = 0, accelBiasY = 0, accelBiasZ = 0;
-double accelRoll = 0;
+float gyroX = 0.0, gyroY = 0.0, gyroZ = 0.0;
+float gyroBiasX = 0.0, gyroBiasY = 0.0, gyroBiasZ = 0.0;
+float gyroRoll = 0.0, gyroRate = 0.0;
 
 /* Assign a unique ID to this sensor at the same time */
 Adafruit_LSM303_Accel_Unified accel = Adafruit_LSM303_Accel_Unified(54321);
@@ -83,10 +83,15 @@ void initSensor(void)
   
   displayGyroSensorDetails();
 
+  showAccelData();
+  showGyroData();
+  
+
   biasValues();
+  getAccelRoll();
 }
 
-// unfinished
+// get initial values as bias
 void biasValues() {
 
   //gettin a mean value from 100 measurements
@@ -103,6 +108,8 @@ void biasValues() {
     gyroBiasZ += gyroZ;
   }
 
+  Serial.println();
+  
   accelBiasX = accelBiasX / 100;
   accelBiasY = accelBiasY / 100;
   accelBiasZ = accelBiasZ / 100;
@@ -151,6 +158,20 @@ void getAccelData(void){
   accelZ = accelEvent.acceleration.z;
 }
 
+double getAccelRoll(void){
+  /* Get a new sensor event */ 
+  sensors_event_t accelEvent; 
+  gyro.getEvent(&accelEvent);
+
+  accelRoll = (atan2(accelEvent.acceleration.y, -accelEvent.acceleration.z)+PI)*RAD_TO_DEG;
+
+  if (accelRoll <= 360 && accelRoll >=180){
+    accelRoll = accelRoll - 360;
+  }
+
+  return accelRoll;
+}
+
 void getGyroData(void){
   /* Get a new sensor event */ 
   sensors_event_t gyroEvent; 
@@ -159,6 +180,15 @@ void getGyroData(void){
   gyroX = gyroEvent.gyro.x;
   gyroY = gyroEvent.gyro.y;
   gyroZ = gyroEvent.gyro.z;
+}
+
+double getGyroRoll(void){
+  getGyroData();
+
+  gyroRate = -(gyroX-gyroBiasX)*0,07;
+  gyroRoll += gyroRate * (micros()-timer/1000000);
+
+  return gyroRoll;
 }
 
 void showAccelData(void)
@@ -171,13 +201,6 @@ void showAccelData(void)
   Serial.print("X: "); Serial.print(accelEvent.acceleration.x); Serial.print("  ");
   Serial.print("Y: "); Serial.print(accelEvent.acceleration.y); Serial.print("  ");
   Serial.print("Z: "); Serial.print(accelEvent.acceleration.z); Serial.print("  ");Serial.println("m/s^2 ");
-
-  /* Note: You can also get the raw (non unified values) for */
-  /* the last data sample as follows. The .getEvent call populates */
-  /* the raw values used below. */
-  //Serial.print("X Raw: "); Serial.print(accel.raw.x); Serial.print("  ");
-  //Serial.print("Y Raw: "); Serial.print(accel.raw.y); Serial.print("  ");
-  //Serial.print("Z Raw: "); Serial.print(accel.raw.z); Serial.println("");
 }
 
 void showGyroData(void) 
