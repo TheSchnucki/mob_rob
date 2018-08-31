@@ -5,6 +5,8 @@
 
 uint32_t timer;
 
+double rollAngle;
+
 void setup() {
   initMotors();
   initSensor();
@@ -12,10 +14,11 @@ void setup() {
 }
 
 void loop() {
-  //driveForward (50);
-  showAccelData();
-  showGyroData();
+  runEvery(10){
+    RollAngle = 0.98 * (RollAngle + getGyroRoll())) + 0.02 * (getAccelRoll());
+    timer = microns();
 
-  delay(1000);
+    
+  }
 
 }
