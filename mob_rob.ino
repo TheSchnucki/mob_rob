@@ -10,6 +10,6 @@ void loop() {
   showAccelData();
   showGyroData();
 
-  delay(20);
+  delay(1000);
 
 }
