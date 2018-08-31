@@ -83,10 +83,6 @@ void initSensor(void)
   
   displayGyroSensorDetails();
 
-  showAccelData();
-  showGyroData();
-  
-
   biasValues();
   getAccelRoll();
 }
@@ -138,12 +134,11 @@ void biasValues() {
 
 // unfinished
 void startValues() {
-  sensors_event_t accelEvent;
-
-  for(int i = 1; i<100; i++) {
-    accel.getEvent(&accelEvent);
-    accelRoll = (atan2(accelEvent.acceleration.y - accelBiasY,
-                      -(accelEvent.acceleration.z - accelBiasZ)) + PI) * RAD_TO_DEG;
+  double startAngle;
+  
+  for (int i=0; i<=100; i++) {
+    startAngle = 0.98 * (startAngle + getGyroRoll()) + 0.02 * getAccelRoll();
+    timer = micros();
   }
   
 }
@@ -151,7 +146,7 @@ void startValues() {
 void getAccelData(void){
   /* Get a new sensor event */ 
   sensors_event_t accelEvent; 
-  gyro.getEvent(&accelEvent);
+  accel.getEvent(&accelEvent);
 
   accelX = accelEvent.acceleration.x;
   accelY = accelEvent.acceleration.y;
@@ -161,7 +156,7 @@ void getAccelData(void){
 double getAccelRoll(void){
   /* Get a new sensor event */ 
   sensors_event_t accelEvent; 
-  gyro.getEvent(&accelEvent);
+  accel.getEvent(&accelEvent);
 
   accelRoll = (atan2(accelEvent.acceleration.y, -accelEvent.acceleration.z)+PI)*RAD_TO_DEG;
 
